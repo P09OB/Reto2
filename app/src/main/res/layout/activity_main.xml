@@ -11,16 +11,16 @@
         android:id="@+id/loginBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="45dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/button"
         android:fontFamily="@font/quicksandmedium"
         android:text="@string/ingresar"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nombre" />
+        app:layout_constraintTop_toBottomOf="@+id/loginNombreUser" />
 
     <ImageView
         android:id="@+id/logo"
@@ -34,12 +34,13 @@
         app:srcCompat="@drawable/logo" />
 
     <EditText
-        android:id="@+id/nombre"
+        android:id="@+id/loginNombreUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="45dp"
+        android:layout_marginEnd="32dp"
+        android:autofillHints=""
         android:background="@drawable/input_text"
         android:ems="10"
         android:fontFamily="@font/quicksandmedium"
@@ -48,6 +49,5 @@
         android:textColorHint="#676767"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 </androidx.constraintlayout.widget.ConstraintLayout>
