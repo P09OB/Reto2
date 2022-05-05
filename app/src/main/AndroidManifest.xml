@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reto2">
         <activity
+            android:name=".PerfilPokemon"
+            android:exported="false" />
+        <activity
             android:name=".Pokedex"
             android:exported="false" />
         <activity

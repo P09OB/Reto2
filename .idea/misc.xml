@@ -3,11 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/drawable/abilities_card.xml" value="0.1" />
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/drawable/button.xml" value="0.1" />
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/drawable/fondo_perfil.xml" value="0.1" />
         <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/drawable/input_text.xml" value="0.1" />
         <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/drawable/u.xml" value="0.1" />
         <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/font/quicksand.xml" value="0.1" />
         <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/activity_pokedex.xml" value="0.25" />
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/activity_perfil_pokemon.xml" value="0.18" />
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/activity_pokedex.xml" value="0.22" />
+        <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/pokemonrow.xml" value="0.25" />
       </map>
     </option>
   </component>

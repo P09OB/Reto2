@@ -25,9 +25,6 @@ class MainActivity : AppCompatActivity() {
         val view= binding.root
         setContentView(view)
 
-        /*binding.loginBtn.setOnClickListener {
-            startActivity(Intent(this, Pokedex::class.java))
-        }*/
 
 
         binding.loginBtn.setOnClickListener {
