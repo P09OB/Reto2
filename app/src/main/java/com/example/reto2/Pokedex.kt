@@ -5,11 +5,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.reto2.databinding.ActivityPokedexBinding
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import model.Pokemon
+import model.User
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Pokedex : AppCompatActivity() {
 
@@ -32,6 +37,7 @@ class Pokedex : AppCompatActivity() {
         binding = ActivityPokedexBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
 
 
         binding.verBtn.setOnClickListener {
@@ -60,9 +66,32 @@ class Pokedex : AppCompatActivity() {
                 it.forEach { pokemon ->
 
                     val firebase = Firebase.firestore.collection("Pokemons")
+                    val collectionUsers = Firebase.firestore.collection("users")
+
+                    val pokemonObj = PokemonAdd (
+                        Date().time,
+                        pokemon.uid
+                    )
+
+                    val list = ArrayList<PokemonAdd>()
+
+                    //OBTENER SUS POKEMONS
+                    collectionUsers.document(userID)
+                        .get()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val document = task.result
+                                if (document.exists()) {
+                                    val getDoc = document.toObject(User::class.java)!!
+                                    Log.e(">>>>>",""+getDoc.idPokemons)
+                                    val liste = getDoc.idPokemons.toArray()
+                                }
+                            }
+                        }
+
 
                     //Verifica
-                    val query = firebase.whereEqualTo("name", pokemon.name)
+                   val query = firebase.whereEqualTo("name", pokemon.name)
                     query.get()
                         .addOnCompleteListener { documents ->
 
@@ -70,12 +99,11 @@ class Pokedex : AppCompatActivity() {
                                 //POKEMON NUEVO
                                 firebase.document(pokemon.uid).set(pokemon)
                                 //LE AGREGA AL USUARIO EL POKEMON
-                                Firebase.firestore.collection("users").document(userID)
-                                    .update("idPokemons", FieldValue.arrayUnion(pokemon.uid))
+                                collectionUsers.document(userID)
+                                    .update("idPokemons", list)
                                     .addOnSuccessListener {
                                         Log.e(
-                                            ">>>>>>>",
-                                            "DocumentSnapshot successfully updated!"
+                                            ">>>>>>>", "DocumentSnapshot successfully updated!"
                                         )
                                     }
                                     .addOnFailureListener { e ->
@@ -91,9 +119,11 @@ class Pokedex : AppCompatActivity() {
 
                                 for (document in documents.result!!) {
                                     var uid = document.getString("uid")
-                                    Firebase.firestore.collection("users")
-                                        .document(userID)
-                                        .update("idPokemons", FieldValue.arrayUnion(uid!!))
+
+
+
+                                    collectionUsers.document(userID)
+                                        .update("idPokemons", list )
                                         .addOnSuccessListener {
                                             Log.e(
                                                 ">>>>>>>",
@@ -125,4 +155,11 @@ class Pokedex : AppCompatActivity() {
 
 
     }
+
+    data class  PokemonAdd(
+
+        var date : Long = 0,
+        var uid: String
+    )
 }
+
