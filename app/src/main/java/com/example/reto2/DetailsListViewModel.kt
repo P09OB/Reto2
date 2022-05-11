@@ -51,8 +51,7 @@ class DetailsListViewModel : ViewModel() {
 
             withContext(Dispatchers.Main){
                 _DetailsList.value = pokemon!!
-                pokemon = null
-
+                Log.e("PROBANDO",""+_DetailsList.value)
             }
 
         }

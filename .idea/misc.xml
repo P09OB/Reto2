@@ -18,6 +18,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16893115942028986" />
         <entry key="app/src/main/res/layout/activity_perfil_pokemon.xml" value="0.27613677978515627" />
         <entry key="app/src/main/res/layout/activity_pokedex.xml" value="0.2167694091796875" />
+        <entry key="app/src/main/res/layout/pokemonrow.xml" value="0.3814453125" />
       </map>
     </option>
   </component>

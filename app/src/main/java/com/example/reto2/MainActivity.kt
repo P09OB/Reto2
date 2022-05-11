@@ -42,7 +42,9 @@ class MainActivity : AppCompatActivity() {
                         lateinit var existingUser : User
                         for(document in documents.result!!){
                             existingUser = document.toObject(User::class.java)
-                            goToPokedex(existingUser.uid)
+                            val ids = existingUser.uid
+
+                            Log.e("HOLA", ""+ids)
                             break
                         }
                     }

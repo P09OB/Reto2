@@ -44,9 +44,6 @@ class PerfilPokemon : AppCompatActivity() {
 
                 binding.namePokemon.append("${pokemon.name}")
 
-
-
-
         }
 
 
