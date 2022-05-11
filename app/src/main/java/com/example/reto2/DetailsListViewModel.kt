@@ -12,13 +12,14 @@ import kotlinx.coroutines.withContext
 import model.Pokemon
 import java.net.URL
 import java.util.*
+import java.util.Collections.fill
 import javax.net.ssl.HttpsURLConnection
 import kotlin.collections.ArrayList
 
 
 class DetailsListViewModel : ViewModel() {
 
-    var _DetailsList: MutableLiveData<ArrayList<Pokemon>> = MutableLiveData()
+    var _DetailsList: MutableLiveData<Pokemon> = MutableLiveData()
 
 
     fun GETListOfDetails(search: String) {
@@ -33,7 +34,7 @@ class DetailsListViewModel : ViewModel() {
 
             val details = ArrayList<Details>()
             val ability = ArrayList<Ability>()
-            val pokemon = ArrayList<Pokemon>()
+            var pokemon : Pokemon?
 
 
             pokemonObj.abilities.forEach {
@@ -46,10 +47,12 @@ class DetailsListViewModel : ViewModel() {
 
             }
 
-            pokemon.add(Pokemon(UUID.randomUUID().toString(),pokemonObj.name,details, ability))
+            pokemon = Pokemon(UUID.randomUUID().toString(),pokemonObj.name,details, ability)
 
             withContext(Dispatchers.Main){
-                _DetailsList.value = pokemon
+                _DetailsList.value = pokemon!!
+                pokemon = null
+
             }
 
         }

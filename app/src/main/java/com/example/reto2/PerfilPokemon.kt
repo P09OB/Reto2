@@ -36,17 +36,15 @@ class PerfilPokemon : AppCompatActivity() {
 
         detailsListViewModel.GETListOfDetails(namePokemon)
 
-        detailsListViewModel._DetailsList.observe(this){
+        detailsListViewModel._DetailsList.observe(this){ pokemon ->
 
             binding.namePokemon.text = ""
 
             binding.details.text = ""
 
-            it.forEach { pokemon ->
-
                 binding.namePokemon.append("${pokemon.name}")
 
-            }
+
 
 
         }

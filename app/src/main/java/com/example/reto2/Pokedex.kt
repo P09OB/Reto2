@@ -20,9 +20,10 @@ class Pokedex : AppCompatActivity() {
 
     private lateinit var binding: ActivityPokedexBinding
     private lateinit var detailsListViewModel: DetailsListViewModel
-    private var pokemonData: Boolean = false
 
     private lateinit var userID: String
+    private lateinit var pokemonObj : PokemonAdd
+    private var pokemonData :Pokemon? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,50 +62,50 @@ class Pokedex : AppCompatActivity() {
 
             detailsListViewModel.GETListOfDetails(binding.atrapaPokemonText.text.toString())
 
-            detailsListViewModel._DetailsList.observe(this) {
+            detailsListViewModel._DetailsList.observe(this) { pokemon->
 
-                it.forEach { pokemon ->
-
-                    val firebase = Firebase.firestore.collection("Pokemons")
-                    val collectionUsers = Firebase.firestore.collection("users")
-
-                    val pokemonObj = PokemonAdd (
+                    pokemonObj = PokemonAdd (
                         Date().time,
                         pokemon.uid
                     )
 
-                    val list = ArrayList<PokemonAdd>()
+                val firebase = Firebase.firestore.collection("Pokemons")
+                val collectionUsers = Firebase.firestore.collection("users")
 
-                    //OBTENER SUS POKEMONS
-                    collectionUsers.document(userID)
-                        .get()
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val document = task.result
-                                if (document.exists()) {
-                                    val getDoc = document.toObject(User::class.java)!!
-                                    Log.e(">>>>>",""+getDoc.idPokemons)
-                                    val liste = getDoc.idPokemons.toArray()
+                //Verifica
+                val query = firebase.whereEqualTo("name", pokemon.name)
+                query.get()
+                    .addOnCompleteListener { documents ->
+
+                        if (documents.result?.size() == 0) {
+                            //POKEMON NUEVO
+                            Log.e("POKEMON NUEVO",""+ documents.result?.size())
+                            firebase.document(pokemonObj.uid).set(pokemon)
+                            //LE AGREGA AL USUARIO EL POKEMON
+                            collectionUsers.document(userID)
+                                .update("idPokemons", FieldValue.arrayUnion(pokemonObj))
+                                .addOnSuccessListener {
+                                    Log.e(">>>>>>>", "Se subio nuevo pokemon")
                                 }
-                            }
-                        }
+                                .addOnFailureListener { e ->
+                                    Log.e(
+                                        ">>>>>>>>>",
+                                        "Error updating document",
+                                        e
+                                    )
+                                }
 
+                        } else {
 
-                    //Verifica
-                   val query = firebase.whereEqualTo("name", pokemon.name)
-                    query.get()
-                        .addOnCompleteListener { documents ->
+                            Log.e("POKEMON VIEJO",""+ documents.result?.size())
+                            //POKEMON VIEJO
 
-                            if (documents.result?.size() == 0) {
-                                //POKEMON NUEVO
-                                firebase.document(pokemon.uid).set(pokemon)
-                                //LE AGREGA AL USUARIO EL POKEMON
+                            for(document in documents.result!!){
+
                                 collectionUsers.document(userID)
-                                    .update("idPokemons", list)
+                                    .update("idPokemons", FieldValue.arrayUnion(pokemonObj) )
                                     .addOnSuccessListener {
-                                        Log.e(
-                                            ">>>>>>>", "DocumentSnapshot successfully updated!"
-                                        )
+                                        Log.e(">>>>>>>", "Se agrego uno nuevo")
                                     }
                                     .addOnFailureListener { e ->
                                         Log.w(
@@ -113,38 +114,12 @@ class Pokedex : AppCompatActivity() {
                                             e
                                         )
                                     }
-
-                            } else {
-                                //POKEMON VIEJO
-
-                                for (document in documents.result!!) {
-                                    var uid = document.getString("uid")
-
-
-
-                                    collectionUsers.document(userID)
-                                        .update("idPokemons", list )
-                                        .addOnSuccessListener {
-                                            Log.e(
-                                                ">>>>>>>",
-                                                "DocumentSnapshot successfully updated!"
-                                            )
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.w(
-                                                ">>>>>>>>>",
-                                                "Error updating document",
-                                                e
-                                            )
-                                        }
-                                    break
-                                }
-
-
+                                break
                             }
 
                         }
 
+                }
 
                 }
 
@@ -153,8 +128,6 @@ class Pokedex : AppCompatActivity() {
 
         }
 
-
-    }
 
     data class  PokemonAdd(
 

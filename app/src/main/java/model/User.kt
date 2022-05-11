@@ -8,5 +8,5 @@ import kotlin.collections.ArrayList
 data class User(
     var uid: String = "",
     var username: String ="",
-    var idPokemons: ArrayList<Pokedex.PokemonAdd>
+    var idPokemons: ArrayList<Fragment?>? = null
 )
