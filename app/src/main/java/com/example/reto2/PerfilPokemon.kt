@@ -43,6 +43,11 @@ class PerfilPokemon : AppCompatActivity() {
                 for (document in documents.result!!) {
                     //Log.e("no se que hago", document.get("name").toString())
                     binding.namePokemon.setText(document.get("name").toString())
+
+                    var i= document.get("details")
+
+                    binding.defensaText.setText(i.toString())
+                    Log.e("masmasda",i.toString() )
                 }
             }
 
