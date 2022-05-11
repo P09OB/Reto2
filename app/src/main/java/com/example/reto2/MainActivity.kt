@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                         for(document in documents.result!!){
                             existingUser = document.toObject(User::class.java)
                             val ids = existingUser.uid
-
+                            goToPokedex(ids)
                             Log.e("HOLA", ""+ids)
                             break
                         }
