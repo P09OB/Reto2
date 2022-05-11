@@ -1,5 +1,6 @@
 package com.example.reto2
 
+import adapters.PokemonAdapter
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.reto2.databinding.ActivityPokedexBinding
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -17,7 +19,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import model.Pokemon
+import model.PokemonAdd
 import model.User
+import viewholders.PokemonVH
 import java.net.URL
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
@@ -26,16 +30,21 @@ import kotlin.collections.ArrayList
 
 class Pokedex : AppCompatActivity() {
 
-    private lateinit var binding: ActivityPokedexBinding
+    private val binding: ActivityPokedexBinding by lazy {
+        ActivityPokedexBinding.inflate(layoutInflater)
+    }
 
     private lateinit var userID: String
     private lateinit var pokemonUser: PokemonAdd
 
-    private lateinit var adapter: ArrayAdapter<Pokemon>
+    private val adapter by lazy {
+        PokemonAdapter()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pokedex)
+        setContentView(binding.root)
+
 
         //OBTENEMOS EL ID DEL USUARIO
         val sharedPreference = getSharedPreferences("datos", Context.MODE_PRIVATE)
@@ -43,9 +52,13 @@ class Pokedex : AppCompatActivity() {
         userID = sharedPreference.getString("userID", "NO_FOUND").toString()
 
         //BINDING
-        binding = ActivityPokedexBinding.inflate(layoutInflater)
+        //binding = ActivityPokedexBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        binding.listaPokemones.adapter = adapter
+        binding.listaPokemones.layoutManager = LinearLayoutManager(this)
+        binding.listaPokemones.setHasFixedSize(true)
 
         //ADAPTER
         lifecycleScope.launch(Dispatchers.IO) {
@@ -56,6 +69,7 @@ class Pokedex : AppCompatActivity() {
             withContext(Dispatchers.Main){
                 for(poke in pokemons){
                     val obj = poke.toObject(PokemonAdd::class.java)!!
+                    adapter.add(obj)
                     Log.e(">>>>>",""+obj)
                 }
             }
@@ -149,11 +163,6 @@ class Pokedex : AppCompatActivity() {
         }
 }
 
-data class PokemonAdd(
-
-    var date: Long = 0,
-    var uid: String = ""
-)
 
 data class PokemonObj(
     var name: String,

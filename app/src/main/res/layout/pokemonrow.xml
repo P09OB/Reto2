@@ -3,21 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="30dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rowPokemon"
         android:layout_width="0dp"
-        android:layout_height="134dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/fondo_perfil"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/nombreRow"
+            android:id="@+id/nombrePokemonRow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:fontFamily="@font/quicksand_bold"
             android:text="Nombre"
@@ -35,14 +37,14 @@
             android:text="Fecha"
             android:textColor="@color/blue"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/nombreRow"
-            app:layout_constraintTop_toBottomOf="@+id/nombreRow" />
+            app:layout_constraintStart_toStartOf="@+id/nombrePokemonRow"
+            app:layout_constraintTop_toBottomOf="@+id/nombrePokemonRow" />
 
         <ImageView
-            android:id="@+id/imgRow"
+            android:id="@+id/imgPokemonRow"
             android:layout_width="123dp"
             android:layout_height="120dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
