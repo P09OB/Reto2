@@ -52,8 +52,7 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
 
     fun goPerfilPokemon(context: Context, position: Int){
         val intent = Intent(context, PerfilPokemon::class.java).apply {
-          /*  editor.putString("user", binding.atrapaPokemonText.text.toString())
-            editor.commit()*/
+            putExtra("pokemon", pokemons[position].uid)
         }
         context.startActivity(intent)
 

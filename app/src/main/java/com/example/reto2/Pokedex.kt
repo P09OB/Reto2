@@ -79,10 +79,23 @@ class Pokedex : AppCompatActivity() {
         //VER EL PERFIL DEL POKEMON
         binding.verBtn.setOnClickListener {
 
-            startActivity(Intent(this, PerfilPokemon::class.java).apply {
-                editor.putString("user", binding.atrapaPokemonText.text.toString())
-                editor.commit()
-            })
+            //BUSCA AL POKEMON POR SU NOMBRE, PARA ENVIAR EL ID AL PERFIL
+            val firebase = Firebase.firestore.collection("Pokemons")
+            val query = firebase.whereEqualTo("name", binding.atrapaPokemonText.text.toString())
+
+            query.get()
+                .addOnCompleteListener { documents ->
+                    for (document in documents.result!!) {
+                        val intent = Intent(this, PerfilPokemon::class.java).apply {
+                            putExtra("pokemon", document.get("uid").toString())
+
+                            /*editor.putString("user", binding.atrapaPokemonText.text.toString())
+                            editor.commit()*/
+                        }
+
+                        startActivity(intent)
+                    }
+                }
         }
 
         //ATRAPAR POKEMON
