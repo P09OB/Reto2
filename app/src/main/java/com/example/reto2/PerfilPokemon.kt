@@ -1,17 +1,13 @@
 package com.example.reto2
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.reto2.databinding.ActivityMainBinding
 import com.example.reto2.databinding.ActivityPerfilPokemonBinding
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,6 +15,7 @@ import kotlinx.coroutines.tasks.await
 import model.Pokemon
 import model.PokemonAdd
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PerfilPokemon : AppCompatActivity() {
 
@@ -51,11 +48,29 @@ class PerfilPokemon : AppCompatActivity() {
 
             binding.namePokemon.text = ""
 
+            binding.type.text = ""
+
             binding.details.text = ""
 
             binding.namePokemon.append("${pokemon.name}")
 
-            poke = Pokemon(pokemon.uid,pokemon.name,pokemon.details,pokemon.abilities)
+            val details : ArrayList<DetailsListViewModel.Details>
+            val types : ArrayList<DetailsListViewModel.Type>
+
+            details = pokemon.details
+            types = pokemon.types
+
+            for (deta in details){
+
+                binding.details.append(deta.stat.name +" "+ deta.base_stat+'\n')
+            }
+
+            for(type in types){
+                binding.type.append(type.name+'\n')
+            }
+
+
+            poke = Pokemon(pokemon.uid,pokemon.name,pokemon.details,pokemon.types)
         }
 
         binding.remove.setOnClickListener{
@@ -65,52 +80,61 @@ class PerfilPokemon : AppCompatActivity() {
                val db = Firebase.firestore.collection("users").document(userID)
                     .collection("pokemons").whereEqualTo("uuid",IDcaught)
                     .get().await().documents
-
-
-
             }
 
         }
 
         binding.atraparBtnPerfil.setOnClickListener {
-
             val collectionUsers = Firebase.firestore.collection("users")
             val firebase = Firebase.firestore.collection("Pokemons")
 
-            //BUSCAMOS EN LA RAMA DE POKEMONS SI EL POKEN YA ESTA DENTRO DE NUESTRA BASE DE DATOS
-            val query = firebase.whereEqualTo("name", poke.name)
-            query.get()
-                .addOnCompleteListener { documents ->
-                    //SI EL POKEMON NO ESTA, LO AGREGAMOS
-                    if (documents.result?.size() == 0) {
-                        firebase.document(poke.uid).set(poke)
-                        //LE AGREGAMOS AL USUARIO EL POKEMON ATRAPADO
-                        collectionUsers.document(userID).collection("pokemons")
-                            .document(UUID.randomUUID().toString()).set(poke)
+            Log.e("ATRAPADO PERFIL", "entre")
 
-                    } else {
+            pokemonUser = PokemonAdd(
+                Date().time,
+                poke.uid,
+                poke.name,
+                UUID.randomUUID().toString()
+            )
 
-                        //EL POKEMON SI ESTA EN LA RAMA
-                        lateinit var uid: String
-                        lateinit var name: String
-
-                        for (document in documents.result!!) {
-                            //ID DEL POKEMON QUE YA ESTA EN LA RAMA
-                            uid = document.get("uid").toString()
-                            name = document.get("name").toString()
-                            //OBJETO SIMPLE PARA AGREGAR EL POKEMON AL USUARIO
-                            pokemonUser = PokemonAdd(
-                                Date().time,
-                                uid,
-                                name
-                            )
-                            //AGREGAR EL POKEMON AL USUARIO
+                //BUSCAMOS EN LA RAMA DE POKEMONS SI EL POKEN YA ESTA DENTRO DE NUESTRA BASE DE DATOS
+                val query = firebase.whereEqualTo("name", poke.name)
+                query.get()
+                    .addOnCompleteListener { documents ->
+                        //SI EL POKEMON NO ESTA, LO AGREGAMOS
+                        if (documents.result?.size() == 0) {
+                            firebase.document(poke.uid).set(poke)
+                            //LE AGREGAMOS AL USUARIO EL POKEMON ATRAPADO
                             collectionUsers.document(userID).collection("pokemons")
-                                .document(UUID.randomUUID().toString()).set(pokemonUser)
-                            break
+                                .document(pokemonUser.uuid).set(pokemonUser)
+                            Toast.makeText(this, "Se atrapo a ${pokemonUser.name}",Toast.LENGTH_LONG).show()
+
+                        } else {
+
+                            //EL POKEMON SI ESTA EN LA RAMA
+                            lateinit var uid: String
+                            lateinit var name: String
+
+                            for (document in documents.result!!) {
+                                //ID DEL POKEMON QUE YA ESTA EN LA RAMA
+                                uid = document.get("uid").toString()
+                                name = document.get("name").toString()
+                                //OBJETO SIMPLE PARA AGREGAR EL POKEMON AL USUARIO
+                                pokemonUser = PokemonAdd(
+                                    Date().time,
+                                    uid,
+                                    name,
+                                    UUID.randomUUID().toString()
+                                )
+                                //AGREGAR EL POKEMON AL USUARIO
+                                collectionUsers.document(userID).collection("pokemons")
+                                    .document(pokemonUser.uuid).set(pokemonUser)
+                                Toast.makeText(this, "Se atrapo a ${pokemonUser.name}",Toast.LENGTH_LONG).show()
+
+                                break
+                            }
                         }
                     }
-                }
         }
 
     }

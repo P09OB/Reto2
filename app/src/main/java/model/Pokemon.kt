@@ -6,7 +6,7 @@ data class Pokemon (
     var uid: String = "",
     var name: String = "",
     var details: ArrayList<DetailsListViewModel.Details>,
-    var abilities: ArrayList<DetailsListViewModel.Ability>
+    var types: ArrayList<DetailsListViewModel.Type>
 
 )
 

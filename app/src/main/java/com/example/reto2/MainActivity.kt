@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.example.reto2.databinding.ActivityMainBinding
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -43,8 +44,9 @@ class MainActivity : AppCompatActivity() {
                         for(document in documents.result!!){
                             existingUser = document.toObject(User::class.java)
                             val ids = existingUser.uid
+                            Toast.makeText(this,"Bienvenido ${existingUser.username}",Toast.LENGTH_LONG).show()
                             goToPokedex(ids)
-                            Log.e("HOLA", ""+ids)
+
                             break
                         }
                     }
@@ -61,7 +63,10 @@ class MainActivity : AppCompatActivity() {
             arrayListOf()
         )
         Firebase.firestore.collection("users").document(user.uid).set(user)
+        Toast.makeText(this,"Gracias por registrarte ${user.username}",Toast.LENGTH_LONG).show()
         goToPokedex(user.uid)
+
+
 
     }
 
@@ -70,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         val sharedPreference = getSharedPreferences("datos", Context.MODE_PRIVATE)
         var editor = sharedPreference.edit()
 
+        binding.loginNombreUser.setText("")
         startActivity(Intent(this, Pokedex::class.java).apply {
             editor.putString("userID",Useruid)
             editor.commit()

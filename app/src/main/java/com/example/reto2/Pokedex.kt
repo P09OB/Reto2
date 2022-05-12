@@ -6,23 +6,19 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.reto2.databinding.ActivityPokedexBinding
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import model.Pokemon
 import model.PokemonAdd
-import model.User
-import viewholders.PokemonVH
 import java.net.URL
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
@@ -42,7 +38,7 @@ class Pokedex : AppCompatActivity() {
         PokemonAdapter()
     }
 
-    private  val perfilPokemon by lazy {
+    private val perfilPokemon by lazy {
         PerfilPokemon()
     }
 
@@ -71,25 +67,30 @@ class Pokedex : AppCompatActivity() {
                 .document(userID)
                 .collection("pokemons")
                 .orderBy("date", Query.Direction.DESCENDING)
-                .addSnapshotListener(this@Pokedex){ result, error ->
+                .addSnapshotListener(this@Pokedex) { result, error ->
 
-                        for (poke in result!!.documents) {
-                            val obj = poke.toObject(PokemonAdd::class.java)!!
-                            adapter.add(obj)
-                            Log.e(">>>>>", "" + obj)
-                        }
+                    for (poke in result!!.documents) {
+                        val obj = poke.toObject(PokemonAdd::class.java)!!
+                        adapter.add(obj)
+                        Log.e(">>>>>", "" + obj)
+                    }
                 }
 
         }
 
         //VER EL PERFIL DEL POKEMON
         binding.verBtn.setOnClickListener {
-            startActivity(Intent(this, PerfilPokemon::class.java).apply {
-                putExtra("pokemon", binding.atrapaPokemonText.text.toString())
-                putExtra("userID",userID)
 
-            })
+            if( binding.atrapaPokemonText.text.toString() != ""){
+                startActivity(Intent(this, PerfilPokemon::class.java).apply {
+                    putExtra("pokemon", binding.atrapaPokemonText.text.toString())
+                    putExtra("userID", userID)
 
+                })
+            } else {
+                Toast.makeText(this, "Llene el campo", Toast.LENGTH_LONG).show()
+
+            }
         }
 
         //ATRAPAR POKEMON
@@ -100,20 +101,25 @@ class Pokedex : AppCompatActivity() {
             editor.commit()
 
             //FUNCION PARA OBTENER EL POKEMON DEL API - LE PASAMOS EL NOMBRE DEL POKEMON
-            GETListOfDetails(binding.atrapaPokemonText.text.toString())
+            if (binding.atrapaPokemonText.text.toString() != "") {
+                GETListOfDetails(binding.atrapaPokemonText.text.toString())
+
+            } else {
+                Toast.makeText(this, "Ingrese un nombre valido", Toast.LENGTH_LONG).show()
+            }
 
         }
 
         //AQUIIIIII ESTA LO DE BUSCARRRRR//////////////////////////////////////
         //BUSCAR ENTRE MIS POKEMONOS
-        binding.buscarBtn.setOnClickListener{
+        binding.buscarBtn.setOnClickListener {
 
             val namePokemon = binding.buscarPokemonText.text.toString()
             Firebase.firestore.collection("users")
                 .document(userID)
                 .collection("pokemons")
-                .whereEqualTo("name",namePokemon)
-                .addSnapshotListener(this@Pokedex){ result, error ->
+                .whereEqualTo("name", namePokemon)
+                .addSnapshotListener(this@Pokedex) { result, error ->
 
                     for (poke in result!!.documents) {
                         val obj = poke.toObject(PokemonAdd::class.java)!!
@@ -122,6 +128,8 @@ class Pokedex : AppCompatActivity() {
                     }
                 }
 
+            binding.buscarPokemonText.setText("")
+
 
         }
 
@@ -129,27 +137,35 @@ class Pokedex : AppCompatActivity() {
     }
 
     fun GETListOfDetails(search: String) {
+
         lifecycleScope.launch(Dispatchers.IO) {
 
             //OBTENEMOS EL POKEMON DEL API
             val collectionUsers = Firebase.firestore.collection("users")
             val firebase = Firebase.firestore.collection("Pokemons")
+            search.trim()
             val url = URL("https://pokeapi.co/api/v2/pokemon/$search")
             val connection = url.openConnection() as HttpsURLConnection
             connection.requestMethod = "GET"
-            val json = connection.inputStream.bufferedReader().readText()
+            val json = connection.inputStream.bufferedReader().readText()!!
+
 
             //DESERIALIZACION  DEL POKEMON QUE OBTUVIMOS
             val pokemonObj = Gson().fromJson(json, DetailsListViewModel.PokemonObj::class.java)
             val details = ArrayList<DetailsListViewModel.Details>()
-            val ability = ArrayList<DetailsListViewModel.Ability>()
-            pokemonObj.abilities.forEach {
-                ability.add(DetailsListViewModel.Ability(it.ability.name))
+            val ability = ArrayList<DetailsListViewModel.Type>()
+
+            pokemonObj.types.forEach {
+                ability.add(DetailsListViewModel.Type(it.type.name))
             }
             pokemonObj.stats.forEach {
                 details.add(DetailsListViewModel.Details(it.stat, it.base_stat))
             }
             var pokemon = Pokemon(UUID.randomUUID().toString(), pokemonObj.name, details, ability)
+
+            withContext(Dispatchers.Main) {
+                binding.atrapaPokemonText.setText("")
+            }
 
             //CREAMOS UN OBJETO PARA GUARDAR LOS DATOS BASICOS DE POKEMON ATRAPADO
             pokemonUser = PokemonAdd(
@@ -169,7 +185,14 @@ class Pokedex : AppCompatActivity() {
                         firebase.document(pokemonUser.uuidPokemon).set(pokemon)
                         //LE AGREGAMOS AL USUARIO EL POKEMON ATRAPADO
                         collectionUsers.document(userID).collection("pokemons")
-                            .document(pokemonUser.uuid).set(pokemonUser)
+                            .document(pokemonUser.uuid).set(pokemonUser).addOnSuccessListener {
+                                Toast.makeText(
+                                    this@Pokedex,
+                                    "Atrapaste a ${pokemon.name}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
 
                     } else {
 
@@ -190,38 +213,48 @@ class Pokedex : AppCompatActivity() {
                             )
                             //AGREGAR EL POKEMON AL USUARIO
                             collectionUsers.document(userID).collection("pokemons")
-                                .document(pokemonUser.uuid).set(pokemonUser)
+                                .document(pokemonUser.uuid).set(pokemonUser).addOnSuccessListener {
+                                    Toast.makeText(
+                                        this@Pokedex,
+                                        "Atrapaste a ${pokemon.name}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
                             break
                         }
                     }
+
                 }
+
+
         }
-}
+
+    }
 
 
-data class PokemonObj(
-    var name: String,
-    var stats: ArrayList<Details>,
-    var abilities: ArrayList<Abilities>
-)
+    data class PokemonObj(
+        var name : String,
+        var stats : ArrayList<Details>,
+        var types : ArrayList<Types>
+    )
 
-data class Details(
-    var stat: Stat,
-    var base_stat: Int
+    data class Details (
+        var stat : Stat,
+        var base_stat : Int
 
-)
+    )
+    data class Types (
+        var type : Type
+    )
 
-data class Abilities(
-    var ability: Ability
-)
+    data class Type(
+        var name: String
+    )
 
-data class Ability(
-    var name: String
-)
-
-data class Stat(
-    var name: String
-)
+    data class Stat (
+        var name : String
+    )
 }
 
 

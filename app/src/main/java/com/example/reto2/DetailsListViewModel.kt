@@ -1,7 +1,5 @@
 package com.example.reto2
 
-import android.accounts.AbstractAccountAuthenticator
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +10,6 @@ import kotlinx.coroutines.withContext
 import model.Pokemon
 import java.net.URL
 import java.util.*
-import java.util.Collections.fill
 import javax.net.ssl.HttpsURLConnection
 import kotlin.collections.ArrayList
 
@@ -33,12 +30,12 @@ class DetailsListViewModel : ViewModel() {
             val pokemonObj = Gson().fromJson(json,PokemonObj::class.java)
 
             val details = ArrayList<Details>()
-            val ability = ArrayList<Ability>()
+            val types = ArrayList<Type>()
             var pokemon : Pokemon?
 
 
-            pokemonObj.abilities.forEach {
-                ability.add(Ability(it.ability.name))
+            pokemonObj.types.forEach {
+                types.add(Type(it.type.name))
             }
 
             pokemonObj.stats.forEach {
@@ -47,11 +44,10 @@ class DetailsListViewModel : ViewModel() {
 
             }
 
-            pokemon = Pokemon(UUID.randomUUID().toString(),pokemonObj.name,details, ability)
+            pokemon = Pokemon(UUID.randomUUID().toString(),pokemonObj.name,details, types)
 
             withContext(Dispatchers.Main){
                 _DetailsList.value = pokemon!!
-                Log.e("PROBANDO",""+_DetailsList.value)
             }
 
         }
@@ -61,7 +57,7 @@ class DetailsListViewModel : ViewModel() {
     data class PokemonObj(
         var name : String,
         var stats : ArrayList<Details>,
-        var abilities : ArrayList<Abilities>
+        var types : ArrayList<Types>
     )
 
     data class Details (
@@ -70,11 +66,11 @@ class DetailsListViewModel : ViewModel() {
 
     )
 
-    data class Abilities (
-        var ability : Ability
+    data class Types (
+        var type : Type
     )
 
-    data class Ability(
+    data class Type(
         var name: String
     )
 
