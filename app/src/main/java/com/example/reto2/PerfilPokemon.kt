@@ -13,29 +13,42 @@ import com.google.firebase.ktx.Firebase
 class PerfilPokemon : AppCompatActivity() {
 
     private lateinit var binding: ActivityPerfilPokemonBinding
-    private lateinit var detailsListViewModel: DetailsListViewModel
+    lateinit var detailsListViewModel: DetailsListViewModel
 
-    private lateinit var namePokemon: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_perfil_pokemon)
 
-        /*val sharedPreference = getSharedPreferences("datos",Context.MODE_PRIVATE)
-        namePokemon = sharedPreference.getString("user", "NO_FOUND").toString()*/
-
         binding= ActivityPerfilPokemonBinding.inflate(layoutInflater)
         val view= binding.root
         setContentView(view)
 
-        //RECIBE EL ID DEL POKEMON PARA BUSCARLO EN FIREBASE
-        var pokemonn= intent.extras?.getString("pokemon")
+        var namePokemon = intent.extras?.getString("pokemon")
 
-        Log.e("el pokemon es", pokemonn.toString())
+        detailsListViewModel = ViewModelProvider(this).get(DetailsListViewModel::class.java)
+
+        detailsListViewModel.GETListOfDetails(namePokemon!!)
+
+        detailsListViewModel._DetailsList.observe(this){ pokemon ->
+
+            binding.namePokemon.text = ""
+
+            binding.details.text = ""
+
+            binding.namePokemon.append("${pokemon.name}")
+        }
+
+    }
+
+    fun onResultFirebase(){
+
+        //RECIBE EL ID DEL POKEMON PARA BUSCARLO EN FIREBASE
+
 
         //BUSCA SUS DATOS
-        val firebase = Firebase.firestore.collection("Pokemons")
+        /*val firebase = Firebase.firestore.collection("Pokemons")
         val query = firebase.whereEqualTo("uid", pokemonn)
 
         query.get()
@@ -49,26 +62,14 @@ class PerfilPokemon : AppCompatActivity() {
                     binding.defensaText.setText(i.toString())
                     Log.e("masmasda",i.toString() )
                 }
-            }
+            }*/
 
-        /*Log.e("NOMBRE", ""+namePokemon)
+    }
 
-        //binding
-        binding= ActivityPerfilPokemonBinding.inflate(layoutInflater)
-        val view= binding.root
-        setContentView(view)
 
-        detailsListViewModel = ViewModelProvider(this).get(DetailsListViewModel::class.java)
+    fun onResultApi (namePokemon : String){
 
-        detailsListViewModel.GETListOfDetails(namePokemon)
 
-        detailsListViewModel._DetailsList.observe(this){ pokemon ->
 
-            binding.namePokemon.text = ""
-
-            binding.details.text = ""
-
-                binding.namePokemon.append("${pokemon.name}")
-        }*/
     }
 }

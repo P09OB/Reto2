@@ -2,9 +2,11 @@ package adapters
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.reto2.DetailsListViewModel
 import com.example.reto2.PerfilPokemon
@@ -14,6 +16,9 @@ import com.google.firebase.ktx.Firebase
 import model.Pokemon
 import model.PokemonAdd
 import viewholders.PokemonVH
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -27,8 +32,13 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
         return PokemonVH(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: PokemonVH, position: Int) {
-        holder.pokemonfecha.text= pokemons[position].date.toString()
+        val current = Date(pokemons[position].date)
+        val formatter = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val date = formatter.format(current)
+
+        holder.pokemonfecha.text= date
 
         val firebase = Firebase.firestore.collection("Pokemons")
         val query = firebase.whereEqualTo("uid", pokemons[position].uid)
@@ -52,7 +62,7 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
 
     fun goPerfilPokemon(context: Context, position: Int){
         val intent = Intent(context, PerfilPokemon::class.java).apply {
-            putExtra("pokemon", pokemons[position].uid)
+            putExtra("pokemon", pokemons[position].name)
         }
         context.startActivity(intent)
 

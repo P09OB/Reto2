@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.reto2.databinding.ActivityPokedexBinding
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -41,6 +42,10 @@ class Pokedex : AppCompatActivity() {
         PokemonAdapter()
     }
 
+    private  val perfilPokemon by lazy {
+        PerfilPokemon()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -62,40 +67,28 @@ class Pokedex : AppCompatActivity() {
 
         //ADAPTER
         lifecycleScope.launch(Dispatchers.IO) {
-            val pokemons = Firebase.firestore.collection("users").document(userID).collection("pokemons")
-                .get()
-                .await().documents
-            Log.e(">>>>>",""+pokemons)
-            withContext(Dispatchers.Main){
-                for(poke in pokemons){
-                    val obj = poke.toObject(PokemonAdd::class.java)!!
-                    adapter.add(obj)
-                    Log.e(">>>>>",""+obj)
+            Firebase.firestore.collection("users")
+                .document(userID)
+                .collection("pokemons")
+                .orderBy("date", Query.Direction.DESCENDING)
+                .addSnapshotListener(this@Pokedex){ result, error ->
+
+                        for (poke in result!!.documents) {
+                            val obj = poke.toObject(PokemonAdd::class.java)!!
+                            adapter.add(obj)
+                            Log.e(">>>>>", "" + obj)
+                        }
                 }
-            }
 
         }
 
         //VER EL PERFIL DEL POKEMON
         binding.verBtn.setOnClickListener {
+            startActivity(Intent(this, PerfilPokemon::class.java).apply {
+                putExtra("pokemon", binding.atrapaPokemonText.text.toString())
 
-            //BUSCA AL POKEMON POR SU NOMBRE, PARA ENVIAR EL ID AL PERFIL
-            val firebase = Firebase.firestore.collection("Pokemons")
-            val query = firebase.whereEqualTo("name", binding.atrapaPokemonText.text.toString())
+            })
 
-            query.get()
-                .addOnCompleteListener { documents ->
-                    for (document in documents.result!!) {
-                        val intent = Intent(this, PerfilPokemon::class.java).apply {
-                            putExtra("pokemon", document.get("uid").toString())
-
-                            /*editor.putString("user", binding.atrapaPokemonText.text.toString())
-                            editor.commit()*/
-                        }
-
-                        startActivity(intent)
-                    }
-                }
         }
 
         //ATRAPAR POKEMON
@@ -139,7 +132,8 @@ class Pokedex : AppCompatActivity() {
             //CREAMOS UN OBJETO PARA GUARDAR LOS DATOS BASICOS DE POKEMON ATRAPADO
             pokemonUser = PokemonAdd(
                 Date().time,
-                pokemon.uid
+                pokemon.uid,
+                pokemon.name
             )
 
 
@@ -158,13 +152,17 @@ class Pokedex : AppCompatActivity() {
 
                         //EL POKEMON SI ESTA EN LA RAMA
                         lateinit var uid: String
+                        lateinit var name: String
+
                         for (document in documents.result!!) {
                             //ID DEL POKEMON QUE YA ESTA EN LA RAMA
                             uid = document.get("uid").toString()
+                            name = document.get("name").toString()
                             //OBJETO SIMPLE PARA AGREGAR EL POKEMON AL USUARIO
                             pokemonUser = PokemonAdd(
                                 Date().time,
-                                uid
+                                uid,
+                                name
                             )
                             //AGREGAR EL POKEMON AL USUARIO
                             collectionUsers.document(userID).collection("pokemons")
