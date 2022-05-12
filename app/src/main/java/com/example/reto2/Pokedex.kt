@@ -86,6 +86,7 @@ class Pokedex : AppCompatActivity() {
         binding.verBtn.setOnClickListener {
             startActivity(Intent(this, PerfilPokemon::class.java).apply {
                 putExtra("pokemon", binding.atrapaPokemonText.text.toString())
+                putExtra("userID",userID)
 
             })
 
@@ -100,6 +101,27 @@ class Pokedex : AppCompatActivity() {
 
             //FUNCION PARA OBTENER EL POKEMON DEL API - LE PASAMOS EL NOMBRE DEL POKEMON
             GETListOfDetails(binding.atrapaPokemonText.text.toString())
+
+        }
+
+        //AQUIIIIII ESTA LO DE BUSCARRRRR//////////////////////////////////////
+        //BUSCAR ENTRE MIS POKEMONOS
+        binding.buscarBtn.setOnClickListener{
+
+            val namePokemon = binding.buscarPokemonText.text.toString()
+            Firebase.firestore.collection("users")
+                .document(userID)
+                .collection("pokemons")
+                .whereEqualTo("name",namePokemon)
+                .addSnapshotListener(this@Pokedex){ result, error ->
+
+                    for (poke in result!!.documents) {
+                        val obj = poke.toObject(PokemonAdd::class.java)!!
+                        adapter.add(obj)
+                        Log.e(">>>>>", "" + obj)
+                    }
+                }
+
 
         }
 
@@ -133,7 +155,8 @@ class Pokedex : AppCompatActivity() {
             pokemonUser = PokemonAdd(
                 Date().time,
                 pokemon.uid,
-                pokemon.name
+                pokemon.name,
+                UUID.randomUUID().toString()
             )
 
 
@@ -143,10 +166,10 @@ class Pokedex : AppCompatActivity() {
                 .addOnCompleteListener { documents ->
                     //SI EL POKEMON NO ESTA, LO AGREGAMOS
                     if (documents.result?.size() == 0) {
-                        firebase.document(pokemonUser.uid).set(pokemon)
+                        firebase.document(pokemonUser.uuidPokemon).set(pokemon)
                         //LE AGREGAMOS AL USUARIO EL POKEMON ATRAPADO
                         collectionUsers.document(userID).collection("pokemons")
-                            .document(UUID.randomUUID().toString()).set(pokemonUser)
+                            .document(pokemonUser.uuid).set(pokemonUser)
 
                     } else {
 
@@ -162,11 +185,12 @@ class Pokedex : AppCompatActivity() {
                             pokemonUser = PokemonAdd(
                                 Date().time,
                                 uid,
-                                name
+                                name,
+                                UUID.randomUUID().toString()
                             )
                             //AGREGAR EL POKEMON AL USUARIO
                             collectionUsers.document(userID).collection("pokemons")
-                                .document(UUID.randomUUID().toString()).set(pokemonUser)
+                                .document(pokemonUser.uuid).set(pokemonUser)
                             break
                         }
                     }

@@ -41,12 +41,11 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
         holder.pokemonfecha.text= date
 
         val firebase = Firebase.firestore.collection("Pokemons")
-        val query = firebase.whereEqualTo("uid", pokemons[position].uid)
+        val query = firebase.whereEqualTo("uid", pokemons[position].uuidPokemon)
 
         query.get()
             .addOnCompleteListener { documents ->
                 for (document in documents.result!!) {
-                   //Log.e("no se que hago", document.get("name").toString())
                     holder.pokemonNombreRow.text=document.get("name").toString()
                 }
             }
@@ -63,6 +62,7 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
     fun goPerfilPokemon(context: Context, position: Int){
         val intent = Intent(context, PerfilPokemon::class.java).apply {
             putExtra("pokemon", pokemons[position].name)
+            putExtra("idAtrapado", pokemons[position].uuid)
         }
         context.startActivity(intent)
 

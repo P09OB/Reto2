@@ -15,8 +15,10 @@
         <entry key="..\:/OctavoSemestre/Pokedex/Reto2/app/src/main/res/layout/pokemonrow.xml" value="0.25" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1265" />
         <entry key="app/src/main/res/drawable/abilities_card.xml" value="0.1705" />
+        <entry key="app/src/main/res/drawable/button.xml" value="0.1705" />
         <entry key="app/src/main/res/drawable/fondo_perfil.xml" value="0.1705" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.141" />
+        <entry key="app/src/main/res/drawable/input_text.xml" value="0.1705" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16893115942028986" />
         <entry key="app/src/main/res/layout/activity_perfil_pokemon.xml" value="0.27613677978515627" />
         <entry key="app/src/main/res/layout/activity_pokedex.xml" value="0.2167694091796875" />

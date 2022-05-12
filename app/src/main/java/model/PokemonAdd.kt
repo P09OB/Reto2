@@ -3,6 +3,7 @@ package model
 data class PokemonAdd(
 
     var date: Long = 0,
-    var uid: String = "",
-    var name: String = ""
+    var uuidPokemon: String = "",
+    var name: String = "",
+    var uuid: String = ""
 )
