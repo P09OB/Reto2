@@ -31,26 +31,30 @@ class MainActivity : AppCompatActivity() {
             val username = binding.loginNombreUser.text.toString()
             val firebase = Firebase.firestore.collection("users")
 
-            firebase.whereEqualTo("username",username)
-                .get().addOnCompleteListener { documents ->
+            if(username != ""){
+                firebase.whereEqualTo("username",username)
+                    .get().addOnCompleteListener { documents ->
 
-                    if(documents.result?.size() == 0){
-                        registerUserData()
-                    }
+                        if(documents.result?.size() == 0){
+                            registerUserData()
+                        }
 
-                    else{
+                        else{
 
-                        lateinit var existingUser : User
-                        for(document in documents.result!!){
-                            existingUser = document.toObject(User::class.java)
-                            val ids = existingUser.uid
-                            Toast.makeText(this,"Bienvenido ${existingUser.username}",Toast.LENGTH_LONG).show()
-                            goToPokedex(ids)
-
-                            break
+                            lateinit var existingUser : User
+                            for(document in documents.result!!){
+                                existingUser = document.toObject(User::class.java)
+                                val ids = existingUser.uid
+                                Toast.makeText(this,"Bienvenido ${existingUser.username}",Toast.LENGTH_LONG).show()
+                                goToPokedex(ids)
+                                finish()
+                            }
                         }
                     }
+            } else {
+                Toast.makeText(this,"Debe escribir su nombre",Toast.LENGTH_LONG).show()
             }
+
 
         }
     }

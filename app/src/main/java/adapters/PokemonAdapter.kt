@@ -73,4 +73,10 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
         notifyItemInserted(pokemons.lastIndex)
     }
 
+    fun clear() {
+        val size: Int = pokemons.size
+        pokemons.clear()
+        notifyItemRangeRemoved(0, size)
+    }
+
 }

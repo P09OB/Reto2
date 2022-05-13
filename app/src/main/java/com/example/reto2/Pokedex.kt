@@ -85,16 +85,19 @@ class Pokedex : AppCompatActivity() {
                 startActivity(Intent(this, PerfilPokemon::class.java).apply {
                     putExtra("pokemon", binding.atrapaPokemonText.text.toString())
                     putExtra("userID", userID)
-
+                    finish()
                 })
             } else {
                 Toast.makeText(this, "Llene el campo", Toast.LENGTH_LONG).show()
-
             }
         }
 
         //ATRAPAR POKEMON
         binding.atraparBtn.setOnClickListener {
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                adapter.clear()
+            }
 
             //ENVIAMOS EL NOMBRE DEL POKEMON
             editor.putString("user", binding.atrapaPokemonText.text.toString())
@@ -103,7 +106,7 @@ class Pokedex : AppCompatActivity() {
             //FUNCION PARA OBTENER EL POKEMON DEL API - LE PASAMOS EL NOMBRE DEL POKEMON
             if (binding.atrapaPokemonText.text.toString() != "") {
                 GETListOfDetails(binding.atrapaPokemonText.text.toString())
-
+                adapter.clear()
             } else {
                 Toast.makeText(this, "Ingrese un nombre valido", Toast.LENGTH_LONG).show()
             }
@@ -113,6 +116,7 @@ class Pokedex : AppCompatActivity() {
         //AQUIIIIII ESTA LO DE BUSCARRRRR//////////////////////////////////////
         //BUSCAR ENTRE MIS POKEMONOS
         binding.buscarBtn.setOnClickListener {
+            adapter.clear()
 
             val namePokemon = binding.buscarPokemonText.text.toString()
             Firebase.firestore.collection("users")

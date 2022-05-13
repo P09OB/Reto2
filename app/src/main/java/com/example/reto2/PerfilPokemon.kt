@@ -1,5 +1,6 @@
 package com.example.reto2
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -39,6 +40,7 @@ class PerfilPokemon : AppCompatActivity() {
         userID = intent.extras?.getString("userID").toString()
         IDcaught = intent.extras?.getString("idAtrapado").toString()
 
+        Log.e("idpoke", IDcaught)
 
         detailsListViewModel = ViewModelProvider(this).get(DetailsListViewModel::class.java)
 
@@ -73,13 +75,17 @@ class PerfilPokemon : AppCompatActivity() {
             poke = Pokemon(pokemon.uid,pokemon.name,pokemon.details,pokemon.types)
         }
 
-        binding.remove.setOnClickListener{
-
+        binding.remove.setOnClickListener {
             //LO DE ELIMINAR
             lifecycleScope.launch(Dispatchers.IO) {
-               val db = Firebase.firestore.collection("users").document(userID)
-                    .collection("pokemons").whereEqualTo("uuid",IDcaught)
-                    .get().await().documents
+                Firebase.firestore.collection("users")
+                .document(userID)
+                .collection("pokemons")
+                .document(IDcaught).delete().addOnSuccessListener {
+                        Log.e(">", "se elimino" + IDcaught)
+                    }.addOnFailureListener {
+                        Log.e("error", it.message.toString())
+                    }
             }
 
         }
@@ -130,7 +136,8 @@ class PerfilPokemon : AppCompatActivity() {
                                 collectionUsers.document(userID).collection("pokemons")
                                     .document(pokemonUser.uuid).set(pokemonUser)
                                 Toast.makeText(this, "Se atrapo a ${pokemonUser.name}",Toast.LENGTH_LONG).show()
-
+                                startActivity(Intent(this, Pokedex::class.java))
+                                finish()
                                 break
                             }
                         }
