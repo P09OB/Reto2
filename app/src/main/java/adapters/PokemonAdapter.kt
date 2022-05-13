@@ -60,6 +60,7 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
     }
 
     fun goPerfilPokemon(context: Context, position: Int){
+
         val intent = Intent(context, PerfilPokemon::class.java).apply {
             putExtra("pokemon", pokemons[position].name)
             putExtra("idAtrapado", pokemons[position].uuid)
@@ -78,5 +79,6 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
         pokemons.clear()
         notifyItemRangeRemoved(0, size)
     }
+
 
 }

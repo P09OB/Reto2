@@ -52,6 +52,8 @@ class Pokedex : AppCompatActivity() {
         var editor = sharedPreference.edit()
         userID = sharedPreference.getString("userID", "NO_FOUND").toString()
 
+        Log.e("el usrrrr", userID)
+
         //BINDING
         //binding = ActivityPokedexBinding.inflate(layoutInflater)
         val view = binding.root

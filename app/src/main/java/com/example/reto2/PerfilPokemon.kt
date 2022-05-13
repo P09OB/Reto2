@@ -1,5 +1,6 @@
 package com.example.reto2
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import model.Pokemon
 import model.PokemonAdd
 import java.util.*
@@ -26,27 +28,33 @@ class PerfilPokemon : AppCompatActivity() {
     private lateinit var pokemonUser: PokemonAdd
     private lateinit var userID : String
     private lateinit var IDcaught : String
-
+    private var pokeEliminado : Boolean= false
+    private lateinit  var pokeNombre: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_perfil_pokemon)
+
+        val sharedPreference = getSharedPreferences("datos", Context.MODE_PRIVATE)
+        userID = sharedPreference.getString("userID", "NO_FOUND").toString()
 
         binding= ActivityPerfilPokemonBinding.inflate(layoutInflater)
         val view= binding.root
         setContentView(view)
 
         var namePokemon = intent.extras?.getString("pokemon")
-        userID = intent.extras?.getString("userID").toString()
+        //userID = intent.extras?.getString("userID").toString()
         IDcaught = intent.extras?.getString("idAtrapado").toString()
 
-        Log.e("idpoke", IDcaught)
+        Log.e("idpoke",IDcaught)
+        Log.e("iduser",userID)
 
         detailsListViewModel = ViewModelProvider(this).get(DetailsListViewModel::class.java)
 
         detailsListViewModel.GETListOfDetails(namePokemon!!)
 
         detailsListViewModel._DetailsList.observe(this){ pokemon ->
+            pokeNombre= pokemon.name
 
             binding.namePokemon.text = ""
 
@@ -75,21 +83,29 @@ class PerfilPokemon : AppCompatActivity() {
             poke = Pokemon(pokemon.uid,pokemon.name,pokemon.details,pokemon.types)
         }
 
+
+        //ELIMINAR AL POKEMON ATRAPADO
         binding.remove.setOnClickListener {
-            //LO DE ELIMINAR
             lifecycleScope.launch(Dispatchers.IO) {
                 Firebase.firestore.collection("users")
                 .document(userID)
                 .collection("pokemons")
                 .document(IDcaught).delete().addOnSuccessListener {
-                        Log.e(">", "se elimino" + IDcaught)
-                    }.addOnFailureListener {
-                        Log.e("error", it.message.toString())
-                    }
-            }
+                    pokeEliminado = true
+                    Log.e(">", "se elimino " + IDcaught)
+                }.addOnFailureListener {
+                    Log.e("error", it.message.toString())
+                }
 
+                withContext(Dispatchers.Main){
+                    Toast.makeText(this@PerfilPokemon,"Se elimino a "+ pokeNombre ,Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this@PerfilPokemon, Pokedex::class.java))
+                }
+            }
         }
 
+
+        //ATRAPAR AL POKEMON
         binding.atraparBtnPerfil.setOnClickListener {
             val collectionUsers = Firebase.firestore.collection("users")
             val firebase = Firebase.firestore.collection("Pokemons")
