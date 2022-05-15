@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.reto2.DetailsListViewModel
 import com.example.reto2.PerfilPokemon
 import com.example.reto2.R
@@ -21,6 +22,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
 
@@ -43,10 +45,15 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonVH>() {
         val firebase = Firebase.firestore.collection("Pokemons")
         val query = firebase.whereEqualTo("uid", pokemons[position].uuidPokemon)
 
+        Glide.with(holder.pokemonImg.context).load(pokemons[position].image).into(holder.pokemonImg)
+
         query.get()
             .addOnCompleteListener { documents ->
                 for (document in documents.result!!) {
                     holder.pokemonNombreRow.text=document.get("name").toString()
+
+
+
                 }
             }
 

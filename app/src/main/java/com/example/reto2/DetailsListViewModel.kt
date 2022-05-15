@@ -44,7 +44,7 @@ class DetailsListViewModel : ViewModel() {
 
             }
 
-            pokemon = Pokemon(UUID.randomUUID().toString(),pokemonObj.name,details, types)
+            pokemon = Pokemon(UUID.randomUUID().toString(),pokemonObj.name,pokemonObj.sprites.front_shiny,details, types)
 
             withContext(Dispatchers.Main){
                 _DetailsList.value = pokemon!!
@@ -57,13 +57,18 @@ class DetailsListViewModel : ViewModel() {
     data class PokemonObj(
         var name : String,
         var stats : ArrayList<Details>,
-        var types : ArrayList<Types>
+        var types : ArrayList<Types>,
+        var sprites : Sprites
     )
 
     data class Details (
         var stat : Stat,
         var base_stat : Int
 
+    )
+
+    data class Sprites (
+        var front_shiny : String
     )
 
     data class Types (
@@ -77,5 +82,5 @@ class DetailsListViewModel : ViewModel() {
     data class Stat (
         var name : String
     )
+}
 
-    }

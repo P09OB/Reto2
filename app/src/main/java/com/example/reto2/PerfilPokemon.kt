@@ -8,9 +8,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.reto2.databinding.ActivityPerfilPokemonBinding
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -64,6 +66,8 @@ class PerfilPokemon : AppCompatActivity() {
 
             binding.namePokemon.append("${pokemon.name}")
 
+            Glide.with(binding.profileImage.context).load(pokemon.URL).into(binding.profileImage)
+
             val details : ArrayList<DetailsListViewModel.Details>
             val types : ArrayList<DetailsListViewModel.Type>
 
@@ -80,7 +84,7 @@ class PerfilPokemon : AppCompatActivity() {
             }
 
 
-            poke = Pokemon(pokemon.uid,pokemon.name,pokemon.details,pokemon.types)
+            poke = Pokemon(pokemon.uid,pokemon.name,pokemon.URL,pokemon.details,pokemon.types)
         }
 
 
@@ -129,6 +133,8 @@ class PerfilPokemon : AppCompatActivity() {
                             //LE AGREGAMOS AL USUARIO EL POKEMON ATRAPADO
                             collectionUsers.document(userID).collection("pokemons")
                                 .document(pokemonUser.uuid).set(pokemonUser)
+
+                           // Firebase.storage.getReference().child("imagenes").child("pokemons").putFile()
                             Toast.makeText(this, "Se atrapo a ${pokemonUser.name}",Toast.LENGTH_LONG).show()
 
                         } else {

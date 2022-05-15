@@ -167,7 +167,7 @@ class Pokedex : AppCompatActivity() {
             pokemonObj.stats.forEach {
                 details.add(DetailsListViewModel.Details(it.stat, it.base_stat))
             }
-            var pokemon = Pokemon(UUID.randomUUID().toString(), pokemonObj.name, details, ability)
+            var pokemon = Pokemon(UUID.randomUUID().toString(), pokemonObj.name, pokemonObj.sprites.front_shiny, details, ability)
 
             withContext(Dispatchers.Main) {
                 binding.atrapaPokemonText.setText("")
@@ -178,6 +178,7 @@ class Pokedex : AppCompatActivity() {
                 Date().time,
                 pokemon.uid,
                 pokemon.name,
+                pokemon.URL,
                 UUID.randomUUID().toString()
             )
 
@@ -205,16 +206,20 @@ class Pokedex : AppCompatActivity() {
                         //EL POKEMON SI ESTA EN LA RAMA
                         lateinit var uid: String
                         lateinit var name: String
+                        lateinit var url: String
 
                         for (document in documents.result!!) {
                             //ID DEL POKEMON QUE YA ESTA EN LA RAMA
                             uid = document.get("uid").toString()
                             name = document.get("name").toString()
+                            url = document.get("url").toString()
+
                             //OBJETO SIMPLE PARA AGREGAR EL POKEMON AL USUARIO
                             pokemonUser = PokemonAdd(
                                 Date().time,
                                 uid,
                                 name,
+                                url,
                                 UUID.randomUUID().toString()
                             )
                             //AGREGAR EL POKEMON AL USUARIO
@@ -242,7 +247,8 @@ class Pokedex : AppCompatActivity() {
     data class PokemonObj(
         var name : String,
         var stats : ArrayList<Details>,
-        var types : ArrayList<Types>
+        var types : ArrayList<Types>,
+        var sprites : Sprites
     )
 
     data class Details (
@@ -250,6 +256,11 @@ class Pokedex : AppCompatActivity() {
         var base_stat : Int
 
     )
+
+    data class Sprites (
+        var front_shiny : String
+        )
+
     data class Types (
         var type : Type
     )
